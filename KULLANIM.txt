@@ -1,0 +1,100 @@
+IDriveReader 1.0 - KULLANIM KILAVUZU
+=====================================
+
+NE YAPAR?
+---------
+BMW F30'a ENET kablosuyla baglanip SADECE OKUMA yapar ve her seyi bir klasore kaydeder:
+  - VIN, aractaki tum modullerin listesi
+  - Her modulun yazilim surumleri (SVK) ve kimlik bilgileri (F100-F1FF)
+  - Tum modullerin ariza kodlari (silmez, sadece okur)
+  - Head unit (NBT EVO): IP adresi, CAFD, coding yedegi (.ncd), FSC durum bilgisi
+  - DME, head unit ve gateway icin tam veri ID taramasi (0000-FFFF)
+  - Motor calisirken DME canli deger kaydi (sicakliklar, basinclar vb. buradan cikacak)
+  - Araca giden/gelen her baytin ham kaydi (frames.jsonl) -> PC'de "sahte arac" simulatoru icin
+
+NE YAPMAZ?
+----------
+Araca hicbir yazma, kodlama, flash, ariza silme, aktuator testi veya oturum degistirme komutu
+GONDEREMEZ. Program bunu kod seviyesinde engeller: sadece UDS 22 (veri oku), 19 02 (ariza oku)
+ve 3E (baglanti kontrol) komutlarina izin verilir, digerleri gonderilmeden reddedilir.
+
+GEREKENLER
+----------
+  - Windows 10/11 laptop (Python vs. KURMAYA GEREK YOK, her sey bu klasorde)
+  - Laptopta Ethernet girisi (yoksa USB-Ethernet adaptoru)
+  - ENET (OBD - RJ45) kablosu
+  - Aku sarj/destek cihazi (tavsiye, oturum yaklasik 1 saat surer)
+  - Laptop sarj aleti (program calisirken laptopun uyumasini kendisi engeller)
+
+USB BELLEGE KOPYALAMA
+---------------------
+"IDriveReader" klasorunun TAMAMINI (IDriveReader.exe + _internal klasoru) USB bellege kopyalayin.
+Sadece exe'yi kopyalamak YETMEZ. Kayitlar ayni klasordeki "kayitlar" klasorune yazilir.
+
+LAPTOPTA ILK ACILIS
+-------------------
+1) USB'deki IDriveReader.exe'ye cift tiklayin.
+2) "Windows bilgisayarinizi korudu" uyarisi cikarsa: "Ek bilgi" -> "Yine de calistir".
+   (Program imzasiz oldugu icin cikar; bir kez yeterli.)
+3) Ilk aramada Windows Guvenlik Duvari izin sorabilir: "Erisime izin ver" deyin. Izin vermezseniz
+   da program yedek yontemle (ARP) araci bulmaya calisir.
+4) ARACA GITMEDEN ONCE "Deneme modu (sahte arac)" dugmesine basin. Program bilgisayarda sahte bir
+   arac calistirip tum adimlari dener (yaklasik 1 dakika). Sonunda "Tum adimlar tamamlandi"
+   gorurseniz laptop hazir demektir. Deneme kayitlari "deneme_..." diye baslar, silebilirsiniz.
+
+ARACTA ADIM ADIM
+----------------
+1) Laptopu sarja, akuye destek cihazini takin.
+2) Telefondaki MHD uygulamasini kapatin, MHD WiFi adaptoru takiliysa cikarin.
+3) Kontagi acin: frene BASMADAN START'a bir kez basin. Motoru CALISTIRMAYIN.
+4) ENET kablosunu OBD portuna ve laptopa takin.
+5) IDriveReader'i acin, secenekleri oldugu gibi birakin (hepsi isaretli, canli kayit 1 dk).
+6) "Baslat"a basin. Ekranin ustunde genel ilerleme (%), adim numarasi ve tahmini kalan sure,
+   altinda o anki adimin yuzdesi gorunur. Kalan sure, aracin cevap hizi olculdukce netlesir
+   (ilk birkac dakika kaba bir tahmindir).
+   - Windows'un kabloya 169.254.x.x adres vermesi 1 dakikayi bulabilir, program bekler.
+   - Program sirayla: VIN -> modul listesi -> surumler -> arizalar -> head unit -> DME taramasi
+     -> CANLI KAYIT -> head unit taramasi -> gateway taramasi yapar.
+   - Oturum boyunca araci KILITLEMEYIN: veri okunurken kapilar kilitlenirse alarm calabilir.
+7) DME taramasindan sonra program "Motoru calistirin" diye soracak:
+   - Arac P'de, el freni cekili, acik havada olsun. Motoru calistirin, "Evet"e basin.
+   - Devir, sicakliklar, turbo basinci, atesleme, etanol gibi bilinen degerler her turda okunur;
+     RAPOR.txt'de min/max olarak gorunur. Diger tum degerler sirayla okunur.
+   - Kayit 1 dakika surer: ilk birkac saniye rolanti, sonra 2-3 kez kisa gaz verin
+     (2500, sonra 4000 devir civari), sonra tekrar rolanti.
+   - Sarj cihaziniz yoksa: motoru en basta calistirip butun oturum boyunca calisir birakabilirsiniz.
+   - Bitince "Motoru durdurabilirsiniz" der. Motoru durdurun ama kontagi tekrar acin
+     (frene basmadan START), kalan taramalar kontak acikken devam eder.
+8) Bir modul cevap vermeyi birakirsa program durup sorar (genelde kontak kapanmistir):
+   kontagi acip "Evet" deyin, kaldigi yerden devam eder.
+9) "Durdur" ile istediginiz an durdurabilirsiniz; o ana kadar okunanlar kaydedilir.
+10) Bitince bir ozet penceresi cikar. "Kayit klasorunu ac" ile klasore gidebilirsiniz.
+
+BANA GETIRMENIZ GEREKEN
+-----------------------
+kayitlar\kayit_<VIN>_<tarih>.zip  dosyasi. (Ayni isimli klasor de var; zip yeterli.)
+Klasordeki RAPOR.txt'yi Not Defteri ile acip ozeti hemen gorebilirsiniz.
+
+ARAC BULUNAMADI DERSE
+---------------------
+  - Kontak acik mi? (gosterge paneli yaniyor olmali)
+  - ENET kablosu iki ucta da tam oturdu mu? Laptopun Ethernet isigi yaniyor mu?
+  - 2 dakika bekleyip tekrar "Baslat"a basin.
+  - Wi-Fi'yi kapatmak ise yarayabilir.
+  - Hala olmuyorsa: Baslat menusu -> "cmd" -> "arp -a" yazin. 169.254 ile baslayan, sonu 255
+    olmayan bir adres goruyorsaniz onu programdaki "Arac IP" kutusuna yazip tekrar deneyin.
+
+KLASORDEKI DOSYALAR
+-------------------
+  RAPOR.txt           insan okunur ozet
+  session.json        oturum bilgisi, hangi adim nasil bitti
+  vehicle.json        VIN ve baglanti bilgisi
+  ecus.json           modul listesi
+  software.json       her modulun SVK ve kimlik DID'leri
+  dtcs.json           ariza kodlari
+  headunit\hu.json    head unit IP, CAFD, FSC durum DID'i
+  headunit\hu_coding_backup.ncd   head unit coding yedegi (arac tarafindan imzali hali)
+  didscan\*.jsonl     DID tarama sonuclari (okunabilen ve kilitli ID'ler)
+  live\*.jsonl        canli kayit ornekleri (zaman damgali)
+  frames.jsonl        araca giden/gelen her cerceve (simulator bunu kullanir)
+  log.txt             ekrandaki gunlugun kopyasi

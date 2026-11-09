@@ -1,0 +1,12 @@
+* text=auto
+
+# macOS launcher must keep Unix line endings to run.
+*.command text eol=lf
+*.bat text eol=crlf
+
+# Packaged programs are committed byte-for-byte.
+dist/IDriveReader/** -text
+dist/IDriveReader-mac/runtime/** binary
+*.tar.gz binary
+*.exe binary
+*.zip binary

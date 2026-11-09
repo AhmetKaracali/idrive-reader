@@ -1,0 +1,67 @@
+IDriveReader 1.0 - macOS KULLANIM KILAVUZU
+==========================================
+
+Windows surumuyle ayni program, ayni okumalar, ayni kayit klasoru. Sadece SALT OKUMA yapar:
+araca hicbir yazma, kodlama, flash veya ariza silme komutu gonderemez.
+
+GEREKENLER
+----------
+  - macOS 11 veya ustu, Apple Silicon (M1/M2/M3...) ya da Intel Mac
+  - USB-C <-> Ethernet adaptoru (MacBook'larda Ethernet girisi yok!)
+  - ENET (OBD - RJ45) kablosu
+  - Mac sarj aleti, mumkunse arac akusune sarj/destek cihazi (oturum yaklasik 1 saat)
+  Python vs. kurmaniza gerek yok; her sey bu klasorde.
+
+KLASORU MAC'E ALMA
+------------------
+"IDriveReader-mac" klasorunun TAMAMINI USB bellekten Mac'e (ornegin Masaustu'ne) kopyalayin.
+USB'den dogrudan da calisir; ama Mac diskine kopyalamak daha sorunsuzdur.
+
+ILK ACILIS
+----------
+1) Klasordeki "IDriveReader.command" dosyasina cift tiklayin.
+   - Bir Terminal penceresi acilir; ilk seferde Python'u hazirlar (yaklasik 30 sn, bir kerelik).
+   - Sonra IDriveReader penceresi acilir. Program calisirken Terminal penceresini KAPATMAYIN.
+2) "acilamiyor / tanimlanamayan gelistirici" uyarisi cikarsa:
+   - Dosyaya sag tiklayin (veya Control+tik) -> "Ac" -> tekrar "Ac".
+   - Olmazsa: Terminal'i acin, "bash " yazip (sonunda bosluk) IDriveReader.command dosyasini
+     Terminal penceresine surukleyin ve Enter'a basin.
+3) Gelen baglantilara izin soran bir pencere cikarsa "Izin Ver" deyin.
+4) ARACA GITMEDEN ONCE "Deneme modu (sahte arac)" dugmesine basin. "Tum adimlar tamamlandi"
+   gorurseniz Mac hazir demektir.
+
+ARACTA ADIM ADIM
+----------------
+1) Mac'i sarja, akuye destek cihazini takin. Mac'in KAPAGINI KAPATMAYIN.
+2) Wi-Fi'yi KAPATIN (menu cubugu -> Wi-Fi -> kapali). Mac'in aramayi Ethernet uzerinden
+   yapmasini garanti eder. Telefondaki MHD uygulamasini kapatin, MHD WiFi adaptorunu cikarin.
+3) Kontagi acin: frene BASMADAN START'a bir kez basin. Motoru CALISTIRMAYIN.
+4) ENET kablosunu OBD portuna, adaptor uzerinden Mac'e takin.
+5) IDriveReader'i acin, "Baslat"a basin. Mac kabloya birkac saniye icinde 169.254.x.x adres verir.
+   Ekranin ustunde genel ilerleme (%), adim numarasi ve tahmini kalan sure gorunur; kalan sure
+   aracin cevap hizi olculdukce netlesir (ilk birkac dakika kaba bir tahmindir).
+6) Oturum boyunca araci KILITLEMEYIN (veri okunurken alarm calabilir).
+7) DME taramasindan sonra program "Motoru calistirin" diye soracak:
+   - Arac P'de, el freni cekili, acik havada. Motoru calistirin, "Evet"e basin.
+   - Kayit 1 dakika surer: ilk birkac saniye rolanti, sonra 2-3 kez kisa gaz verin
+     (2500, sonra 4000 devir civari), sonra tekrar rolanti.
+   - Sarj cihaziniz yoksa: motoru en basta calistirip butun oturum boyunca calisir birakabilirsiniz.
+   - Bitince motoru durdurun, kontagi tekrar acin (frene basmadan START); kalan taramalar devam eder.
+8) Bir modul cevap vermezse program sorar: kontagi acip "Evet" deyin, kaldigi yerden devam eder.
+9) Bitince ozet penceresi cikar. "Kayit klasorunu ac" Finder'da klasoru acar.
+
+BANA GETIRMENIZ GEREKEN
+-----------------------
+IDriveReader-mac/kayitlar/kayit_<VIN>_<tarih>.zip
+
+ARAC BULUNAMADI DERSE
+---------------------
+  - Kontak acik mi? Adaptor ve kablo tam oturdu mu?
+  - Sistem Ayarlari -> Ag: Ethernet adaptoru "Bagli" gorunmeli, IP 169.254.x.x olmali.
+  - Wi-Fi kapali mi?
+  - Hala olmuyorsa Terminal'de "arp -a" yazin; 169.254 ile baslayan (sonu 255 olmayan) bir
+    adresi programdaki "Arac IP" kutusuna yazip tekrar deneyin.
+
+NOT: Program ilk calistirmada Python'u su klasore acar (yaklasik 80 MB):
+~/Library/Application Support/IDriveReader
+Isiniz bitince bu klasoru silebilirsiniz; Mac'te baska hicbir sey degismez.

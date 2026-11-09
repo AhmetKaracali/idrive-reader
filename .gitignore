@@ -1,0 +1,11 @@
+# Capture output: contains the car's VIN and full diagnostic data. Never commit.
+kayitlar/
+
+# Local build environment and caches (rebuilt by build.bat)
+.venv/
+build/
+__pycache__/
+*.pyc
+
+# Review notes written by local agents
+.claude/agent-memory-local/
